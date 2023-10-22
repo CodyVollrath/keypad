@@ -102,12 +102,9 @@ void enterProgramMode(char button) {
   if (isProgramMode) {
     Serial.println("Programming Mode is already enabled");
     return;
-  } else if (password) {
-    Serial.println("Entering Programing Mode");
-    Serial.println("Enter Password");
-  } else {
-    Serial.println("Password is not set and you are not in programming mode... Contact Administrator!");
   }
+  Serial.println("Entering Programing Mode");
+  Serial.println("Enter Password");
 
   isPromptingProgramMode = 1;
   takeKeyActions(button, checkPassword);
