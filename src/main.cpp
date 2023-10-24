@@ -1,6 +1,5 @@
 #include <Arduino.h>
-#include <Keypad.h>
-#include <LiquidCrystal.h>
+#include "model/LcdKeypad.h"
 
 const byte COLS = 4;
 const byte ROWS = 4;
@@ -8,35 +7,13 @@ const byte ROWS = 4;
 bool isProgramMode = 1;
 bool isPromptingProgramMode = 0;
 
-char hexaKeys[ROWS][COLS] = {
-  {'1', '2', '3', 'A'}, 
-  {'4', '5', '6', 'B'}, 
-  {'7', '8', '9', 'C'}, 
-  {'*', '0', '#', 'D'}
-};
-
 byte colPins[ROWS] = {5, 4, 3, 2};
 byte rowPins[COLS] = {9, 8, 7, 6};
-
-
-// Interface with keypad
-Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
-
-// Interface with LCD
-LiquidCrystal lcd = LiquidCrystal(52, 53, 51, 49, 47, 45);                                                                                                                                                                                  
+LcdKeypad keypad = LcdKeypad(rowPins, colPins, 52, 53, 51, 49, 47, 45);
 
 // entered keys
 char keypadSeq[4];
 char password[4];
-
-//Private Helper for LCD
-
-void clear() {
-  lcd.clear();
-  lcd.setCursor(1,0);
-}
-
-// End Private Helper
 
 // Private Helpers Keypad
 int getSizeOfNonZeroChars() {
@@ -46,7 +23,6 @@ int getSizeOfNonZeroChars() {
 }
 
 void addToKeySeq(char button) {
-    lcd.print(button);
     for (int i = 0; i < 4; i++) {
       if (!keypadSeq[i]) {
         keypadSeq[i] = button;
@@ -69,39 +45,36 @@ void setKeysTo0() {
 }
 
 void setPasswordToKeypadSeq() {
-  clear();
   for (int i = 0; i < 4; i++) {
     password[i] = keypadSeq[i];
   }
-  lcd.print("Password Set");
-  isProgramMode = 0;
-  delay(1000);
-  clear();
   
+  isProgramMode = 0;
+  keypad.display("Password Set", 1);
+}
+
+void displayProgramMode() {
+    delay(1000);
+    keypad.clear();
+    keypad.display("PM Mode On", 0);
+    keypad.setCursor(0, 1);
 }
 
 void checkPassword() {
-  clear();
   int isPassword = comparePassword();
   if (isPassword) {
-    lcd.print("Password Matches");
+    keypad.display("Password Match", 0);
     if (isPromptingProgramMode) {
       isPromptingProgramMode = 0;
       isProgramMode = 1;
-      delay(1000);
-      clear();
-      lcd.print("PM Mode On");
-      lcd.setCursor(0, 1);
-      
+      displayProgramMode();
       return;
     }
+    delay(1000);
+    keypad.clear();
   } else {
-    lcd.print("NO MATCH!");
+    keypad.display("NO MATCH", 1);
   }
-  
-  delay(1000);
-  clear();
-  
 }
 
 void takeKeyActions(char button, void (*terminationAction)()) {
@@ -109,29 +82,25 @@ void takeKeyActions(char button, void (*terminationAction)()) {
   if (button != '#' && button != '*' && size < 4) {
     addToKeySeq(button);
   } else if (button == '#') {
-    clear();
+    keypad.clear();
     terminationAction();
     setKeysTo0();
   } else if (size == 4) {
-    clear();
-    lcd.print("resetting...");
+    keypad.display("Resetting...", 1);
     setKeysTo0();
-    delay(1000);
-    clear();
   }
 }
 
 void enterProgramMode(char button) {
-  clear();
+  keypad.clear();
   if (isProgramMode) {
     return;
   }
-  lcd.print("Entering PM");
-  delay(1000);
-  clear();
-  lcd.print("Enter Password");
-  lcd.setCursor(0, 1);
   isPromptingProgramMode = 1;
+  keypad.display("Entering PM", 1);
+  keypad.display("Enter Password", 0);
+  keypad.setCursor(0, 1);
+  
   takeKeyActions(button, checkPassword);
 }
 
@@ -152,13 +121,12 @@ void performKeyChecks(char button) {
 
 void setup() {
   Serial.begin(9600);
-  lcd.begin(16, 2);
-  lcd.print("PM Mode On");
-  lcd.setCursor(0, 1);
+  keypad.display("Pm Mode On", 0);
+  keypad.setCursor(0, 1);
 }
 
 void loop() {
-  char button = customKeypad.getKey();
+  char button = keypad.getAndDisplayKey();
   if (button) {
     performKeyChecks(button);
   }
