@@ -18,7 +18,7 @@ LcdKeypad::~LcdKeypad() {
 char LcdKeypad::getAndDisplayKey() {
     char key = Keypad::getKey();
     if (key && (key != '#' || key != '*')) {
-        this->lcd->print(key);
+        this->lcd->print("*");
     }
     return key;
 }

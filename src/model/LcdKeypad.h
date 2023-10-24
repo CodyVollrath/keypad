@@ -2,7 +2,7 @@
 #include <LiquidCrystal.h>
 
 /**
- * LCDKeypad is a programmable keypad class that has an lCD and keypad attached
+ * LCDKeypad is a programmable keypad class that represents an lCD and keypad attached
 */
 class LcdKeypad : Keypad{
     public:

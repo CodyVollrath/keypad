@@ -86,6 +86,7 @@ void takeKeyActions(char button, void (*terminationAction)()) {
     terminationAction();
     setKeysTo0();
   } else if (size == 4) {
+    keypad.clear();
     keypad.display("Resetting...", 1);
     setKeysTo0();
   }
