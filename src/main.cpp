@@ -9,5 +9,8 @@ void setup() {
 }
 
 void loop() {
-  controller.performKeyChecks();
+  char button = controller.getAndDisplayButton();
+  if (button) {
+    controller.performKeyChecks();
+  }
 }
