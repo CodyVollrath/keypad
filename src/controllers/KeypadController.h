@@ -5,6 +5,7 @@ class KeypadController {
         KeypadController();
         virtual ~KeypadController();
         void performKeyChecks();
+        char getButton();
 
     private:
         static const byte COLS = 4;
