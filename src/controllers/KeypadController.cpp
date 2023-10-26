@@ -14,8 +14,6 @@ KeypadController::~KeypadController() {
 
 // Public Methods
 void KeypadController::performKeyChecks() {
-    char button = this->keypad->getAndDisplayKey();
-    if (!button) return;
     if (this->isProgramMode) {
       this->takeKeyActions(button, setPasswordToKeypadSeq);
     } 
@@ -25,6 +23,10 @@ void KeypadController::performKeyChecks() {
     else {
       this->takeKeyActions(button, checkPassword);
     }
+}
+
+char KeypadController::getAndDisplayButton() {
+    return this->keypad->getAndDisplay(key);
 }
 
 
